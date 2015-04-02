@@ -1,0 +1,54 @@
+                        jmp einrichten
+
+include 83_i.a86
+include ..\lhtsr\lh.a86
+include ..\lhtsr\prg.a86
+
+programm_name:		db '83      '
+programm_resident_ende: dw tsr_ende
+
+programm_int            equ 021
+programm_int_neu        equ int_21_neu
+programm_int_org        equ int_21_org
+
+titel:                  db '83 * Veit Kannegieser * 01.頰02.04.1998',00d,00a,'$'
+
+#if englisch
+installation_text:	db '83 loaded',00d,00a
+			db '$'
+deinstallation_text:	db '83 removed',00d,00a
+			db '$'
+doppelt_text:		db 'multiple install of 83 !',00d,00a
+			db '$'
+nichtaktiv_text:	db '83 not found active in memory !',00d,00a
+			db '$'
+#else
+installation_text:	db 'lade 83',00d,00a
+			db '$'
+deinstallation_text:	db 'entferne 83',00d,00a
+			db '$'
+doppelt_text:		db 'mehrfache Installation von 83 !',00d,00a
+			db '$'
+nichtaktiv_text:	db '83 nicht aktiv im Speicher gefunden !',00d,00a
+			db '$'
+#endif
+
+einrichten:
+                        mov ah,009
+                        mov dx,titel
+                        int 021
+
+                        einfaches_tsr
+
+			mov ax,04c00
+			int 021
+
+;컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�
+
+installations_prozedur:
+			ret
+
+;컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�
+
+deinstallations_prozedur:
+			ret

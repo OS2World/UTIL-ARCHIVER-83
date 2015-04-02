@@ -1,0 +1,109 @@
+even 010
+
+; 83
+; Veit Kannegieser 01.04.1998
+
+;***************************************************************************
+
+int_21_org:
+int_21_org_o		dw ?
+int_21_org_s		dw ?
+
+int_21_neu:
+                        pushf
+                          cmp ah,03c
+                          je create
+                          cmp ah,059
+                          je create
+                          cmp ah,056
+                          je rename
+weiter:
+                        popf
+			jmp d cs:[int_21_org]
+
+;***************************************************************************
+create:
+                        ; DS:DX
+                        call name_aendern
+                        jmp weiter
+
+;***************************************************************************
+rename:
+                        ; ES:DI
+                        push ds
+                          push es
+                          pop ds
+                          xchg di,dx
+                          call name_aendern
+                          xchg di,dx
+                        pop ds
+                        jmp weiter
+
+;***************************************************************************
+name_aendern:
+                        cmp dx,2
+                        if nae ret
+
+                        push ax,cx,dx,si,di
+
+                          mov si,dx
+                          push [si-2]
+                            mov cl,0
+                            cld
+                            push si
+suche_ende_schleife:
+                              lodsb
+                              inc cx
+                              cmp al,0
+                              jne suche_ende_schleife
+
+                            pop si
+
+                            mov [si-2],cl ; Gr”áe
+                            dec cx
+                            mov [si-1],cl ; L„nge
+                            mov di,si
+                            add di,cx
+                            mov b [di],00d
+
+
+                            ; mov cx,cx ; Anzahl Zeichen
+taste_rechts_schleife:
+                            push cx
+                              mov ah,005
+                              mov cx,04d00
+                              int 016
+                            pop cx
+                            loop taste_rechts_schleife
+
+                            ; Zeichenketteneingabe
+                            mov ah,00a
+                            lea dx,[si-2]
+                            pushf
+                            call d cs:[int_21_org]
+
+                            mov ah,0
+                            mov al,[si-2] ; Gr”áe
+                            mov di,ax
+                            add di,si
+                            dec di
+                            mov b [di],000
+
+  fuellschleife:
+                            dec al
+                            dec di
+                            cmp al,b [si-1]
+                            je fuellschleife_ende
+
+                            mov b [di],' '
+                            jmp fuellschleife
+  fuellschleife_ende:
+                          pop [si-2]
+                        pop di,si,dx,cx,ax
+                        ret
+
+;***************************************************************************
+
+tsr_ende:
+
+;***************************************************************************
